@@ -13,8 +13,11 @@ public class ChatServer {
 
 	private ServerSocket serverSocket;
 	private Socket socket;
+	
 	private InputStream inputStream;
 	private OutputStream outputStream;
+	
+	private String name;
 	
 	
 	public void createSocket() {
@@ -22,6 +25,9 @@ public class ChatServer {
 		try {
 			serverSocket = new ServerSocket(9999);
 			System.out.println("create server");
+			
+			System.out.print("이름을 입력하세요 : ");
+			name= new BufferedReader(new InputStreamReader(System.in)).readLine();
 			
 			while(true) {
 				socket = serverSocket.accept();
@@ -32,9 +38,8 @@ public class ChatServer {
 				System.out.println("연결");
 				
 				createReadThread();
-				createWriteThread();
-				
-			}
+				createWriteThread();			
+			}		
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -43,7 +48,8 @@ public class ChatServer {
 	
 	
 	public void createReadThread() {
-		Thread readThread = new Thread() {
+		
+		Thread readThread = new Thread(new Runnable() {		
 			public void run() {
 				while (socket.isConnected()) {
 					try {
@@ -55,7 +61,7 @@ public class ChatServer {
 							System.arraycopy(readBuffer, 0, arrayBytes, 0, num);
 							String receivedMsg = new String(arrayBytes, "UTF-8");
 							
-							System.out.println("Received message :" + receivedMsg);
+							System.out.println(receivedMsg);
 						} else {
 							notify();
 						}
@@ -65,9 +71,9 @@ public class ChatServer {
 						e.printStackTrace();
 					}
 
-				}//end of while
-			}//end of run
-		};//end of thread
+				}
+			}
+		});
 		
 		readThread.setPriority(Thread.MAX_PRIORITY);
 		readThread.start();
@@ -80,11 +86,19 @@ public class ChatServer {
 				while (socket.isConnected()) {
 					try {
 						BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-						sleep(100);
-						String typedMessage = inputReader.readLine();
-						if (typedMessage != null && typedMessage.length() > 0) {
+						sleep(100);					
+						
+						String typedMsg =   inputReader.readLine();
+						
+						if(typedMsg.equals("exit"))
+							System.exit(0);
+										
+						typedMsg = name + " : " + typedMsg;
+						
+						
+						if (typedMsg != null && typedMsg.length() > 0) {
 							synchronized (socket) {
-								outputStream.write(typedMessage.getBytes("UTF-8"));
+								outputStream.write(typedMsg.getBytes("UTF-8"));
 								sleep(100);
 							}
 						}
@@ -92,9 +106,9 @@ public class ChatServer {
 						e.printStackTrace();
 					}
 
-				}//end of while
-			}//end of run
-		};//end of thread
+				}
+			}
+		};
 		writeThread.setPriority(Thread.MAX_PRIORITY);
 		writeThread.start();
 

@@ -1,6 +1,7 @@
 package exam;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -12,13 +13,20 @@ public class ChatClient {
 	private InputStream inputStream;
 	private OutputStream outputStream;
 	
+	private String name;
+	
 	
 	public void createSocket() {
 		try {
+			
+			System.out.print("이름을 입력하세요 : ");
+			name= new BufferedReader(new InputStreamReader(System.in)).readLine();
+					
 			socket = new Socket("localHost", 9999);
 			System.out.println("연결");
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();
+
 			createReadThread();
 			createWriteThread();
 		} catch (Exception e) {
@@ -28,6 +36,8 @@ public class ChatClient {
 	
 	
 	public void createReadThread() {
+		
+	
 		Thread readThread = new Thread() {
 			public void run() {
 				while (socket.isConnected()) {
@@ -62,10 +72,19 @@ public class ChatClient {
 					try {
 						BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 						sleep(100);
-						String typedMessage = inputReader.readLine();
-						if (typedMessage != null && typedMessage.length() > 0) {
+						
+						
+						
+						String typedMsg =   inputReader.readLine();
+						
+						if(typedMsg.equals("exit"))
+							System.exit(0);
+										
+						typedMsg = name + " : " + typedMsg;
+										
+						if (typedMsg != null && typedMsg.length() > 0) {
 							synchronized (socket) {
-								outputStream.write(typedMessage.getBytes("UTF-8"));
+								outputStream.write(typedMsg.getBytes("UTF-8"));
 								sleep(100);
 							}
 						}
