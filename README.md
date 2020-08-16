@@ -45,3 +45,14 @@
 ### 5주차
 	* thread와 socket을 이용한 콘솔 채팅 프로그램
 	* https://www.data.go.kr 데이터 포털 제공 데이터를 활용할 수 있는 주제 선정
+
+### 6주차
+	* MariaDB
+		- 설치
+  		- Database 생성부터 table 생성까지
+  		- 데이터 삽입, 조회
+		- connector를 이용한 연동
+	* Jsoup
+		- jsoup??
+		- parsing, crawling에 대해
+		- 예제
